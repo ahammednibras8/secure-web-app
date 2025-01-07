@@ -2,3 +2,16 @@
 node_modules/
 .env
 .DS_Store
+
+# React (Frontend)
+/frontend/node_modules/
+/frontend/.env
+/frontend/build/
+
+# TypeScript
+/frontend/dist/
+/backend/dist/
+
+# Other OS and IDE files
+.vscode/
+.idea/
