@@ -8,7 +8,7 @@ const router = express.Router();
 dotenv.config();
 
 //Test Data (TODO: Update with real Database):
-const users: { id: number; username: string; password: string; }[] = [];
+const users: { id: number; username: string; password: string; role: string }[] = [];
 let userId = 1;
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -18,10 +18,16 @@ if (!JWT_SECRET) {
 
 // User Registration:
 router.post('/register', async (req: Request, res: Response): Promise<any> => {
-    const { username, password } = req.body;
+    const { username, password, role } = req.body;
 
     if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
+    }
+
+    // Role Check
+    if (!role || !["user", "admin"].includes(role)) {
+        return res.status(400).json({ message: "Invalid role. Allowed roles: user, admin." });
+
     }
 
     //Username already exist:
@@ -33,7 +39,7 @@ router.post('/register', async (req: Request, res: Response): Promise<any> => {
     //Password Hash
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = { id: userId++, username, password: hashedPassword };
+    const newUser = { id: userId++, username, password: hashedPassword, role };
     users.push(newUser);
 
     res.status(201).json({ message: 'User registered successfully', userId: newUser.id });
@@ -60,16 +66,11 @@ router.post('/login', async (req: Request, res: Response): Promise<any> => {
     }
 
     //Generate JWT TOKEN
-    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, {
+    const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, {
         expiresIn: "1h",
     });
 
     res.status(200).json({ message: 'Login successful', token });
-});
-
-//restricted Route
-router.get('/admin', verifyToken, (req: Request, res: Response) => {
-    res.status(200).json({ message: 'Welcome to admin panel!' });
 });
 
 export default router;
