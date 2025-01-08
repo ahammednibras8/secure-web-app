@@ -3,8 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import dotenv from "dotenv";
 import prisma from "../config/db";
-import { verifyToken } from "../middleware/authMiddleware";
-import { error } from "console";
 
 dotenv.config();
 
